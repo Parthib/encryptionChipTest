@@ -28,7 +28,8 @@
 enum state {
   settingSeed,
   settingCharacter,
-  awaitingInputAck
+  awaitingInputAck,
+  awaitingInputAckLow
 };
 
 state currentState = settingSeed;
@@ -109,7 +110,7 @@ void setInput(int valToWrite) {
   // Set the pins to the seed value
   for (int i = 1; i <= 8; i++) {
     // Bitwise AND select of the seed value at the bit position
-    int setVal = (1 << (i - 1)) & valToWrite;
+    int setVal = (valToWrite >> (i - 1)) & 1;
     // Opposite value to save to the false rail
     int oppVal = (setVal == 1) ? 0 : 1;
 
@@ -234,16 +235,19 @@ void mappedWrite(String pinName, int writeVal) {
   else if (pinName.equals("boardReset")) {
      digitalWrite(A5, writeVal);
   }
+Serial.println("Wrote " + String(writeVal) + " " + pinName);
 }
 
 int index = 0;
 
 void loop() {
-  delay(200);
+  delay(2000);
 
   bool inputa = digitalRead(A4) == HIGH;
 
-  if (currentState != awaitingInputAck) {
+  Serial.println(currentState);
+
+  if (currentState != awaitingInputAck && currentState != awaitingInputAckLow) {
     if (currentState == settingSeed) {
       Serial.println("Setting seed");
       setSeed(seed);
@@ -251,7 +255,7 @@ void loop() {
     }
     else if (currentState == settingCharacter) {
       if (index < toEncrypt.length()) {
-        Serial.println("Writing " + toEncrypt[index]);
+        Serial.println("Writing " + String(toEncrypt[index]));
         writeCharacter(toEncrypt[index]);
         currentState = awaitingInputAck;
         index += 1;
@@ -261,9 +265,13 @@ void loop() {
       }
     }
   }
-  else if (inputa) {
-    Serial.println("Awaiting input ack");
+  else if ((currentState == awaitingInputAck) && inputa) {
+    Serial.println("Saw ack. Awaiting ack to go low");
     softReset();
+    currentState = awaitingInputAckLow;
+  }
+  else if ((currentState == awaitingInputAckLow) && !inputa) {
+    Serial.println("Saw ack go low. Ready to set next character");
     currentState = settingCharacter;
   }
 

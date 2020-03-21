@@ -196,45 +196,29 @@ int getChar() {
 }
 
 void debug() {
-
-  String output1t = String(digitalRead(2));
-  String output2t = String(digitalRead(3));
-  String output3t = String(digitalRead(4));
-  String output4t = String(digitalRead(5));
-  String output5t = String(digitalRead(6));
-  String output6t = String(digitalRead(7));
-  String output7t = String(digitalRead(8));
-  String output8t = String(digitalRead(9));
-  String output1f = String(digitalRead(10));
-  String output2f = String(digitalRead(11));
-  String output3f = String(digitalRead(12));
-  String output4f = String(digitalRead(13));
-  String output5f = String(digitalRead(A0));
-  String output6f = String(digitalRead(A1));
-  String output7f = String(digitalRead(A2));
-  String output8f = String(digitalRead(A3));
-
-  Serial.println("output1t: " + output1t);
-  Serial.println("output2t: " + output2t);
-  Serial.println("output3t: " + output3t);
-  Serial.println("output4t: " + output4t);
-  Serial.println("output5t: " + output5t);
-  Serial.println("output6t: " + output6t);
-  Serial.println("output7t: " + output7t);
-  Serial.println("output8t: " + output8t);
-  Serial.println("output1f: " + output1f);
-  Serial.println("output2f: " + output2f);
-  Serial.println("output3f: " + output3f);
-  Serial.println("output4f: " + output4f);
-  Serial.println("output5f: " + output5f);
-  Serial.println("output6f: " + output6f);
-  Serial.println("output7f: " + output7f);
-  Serial.println("output8f: " + output8f);
+  Serial.println("output1t: " + String(digitalRead(2)));
+  Serial.println("output2t: " + String(digitalRead(3)));
+  Serial.println("output3t: " + String(digitalRead(4)));
+  Serial.println("output4t: " + String(digitalRead(5)));
+  Serial.println("output5t: " + String(digitalRead(6)));
+  Serial.println("output6t: " + String(digitalRead(7)));
+  Serial.println("output7t: " + String(digitalRead(8)));
+  Serial.println("output8t: " + String(digitalRead(9)));
+  Serial.println("output1f: " + String(digitalRead(10)));
+  Serial.println("output2f: " + String(digitalRead(11)));
+  Serial.println("output3f: " + String(digitalRead(12)));
+  Serial.println("output4f: " + String(digitalRead(13)));
+  Serial.println("output5f: " + String(digitalRead(A0)));
+  Serial.println("output6f: " + String(digitalRead(A1)));
+  Serial.println("output7f: " + String(digitalRead(A2)));
+  Serial.println("output8f: " + String(digitalRead(A3)));
 }
 
 // Do the following forever
 void loop() {
   // Get the character if any
+
+  delay(2000);
   int charVal = getChar();
   debug();
   // If we are waiting for a character and we get something that is not -1, we print it
