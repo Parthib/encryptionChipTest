@@ -36,7 +36,7 @@ state currentState = settingSeed;
 
 int seed = 255;
 String toEncrypt = "Hello world!";
-int delayTime = 200;
+int delayTime = 2000;
 
 void setup() {
   pinMode(0, OUTPUT);
@@ -157,6 +157,8 @@ void setSeed(int seedVal) {
   mappedWrite("ct", HIGH);
   mappedWrite("cf", LOW);
 
+  delay(delayTime);
+
   // Set the input rails to the seed value
   setInput(seedVal);
 }
@@ -245,8 +247,6 @@ void loop() {
 
   bool inputa = digitalRead(A4) == HIGH;
 
-  Serial.println(currentState);
-
   if (currentState != awaitingInputAck && currentState != awaitingInputAckLow) {
     if (currentState == settingSeed) {
       Serial.println("Setting seed");
@@ -273,6 +273,9 @@ void loop() {
   else if ((currentState == awaitingInputAckLow) && !inputa) {
     Serial.println("Saw ack go low. Ready to set next character");
     currentState = settingCharacter;
+  }
+  else {
+    Serial.println("State: " + String(currentState));
   }
 
 }

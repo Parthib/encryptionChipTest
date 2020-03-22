@@ -18,6 +18,9 @@
 // output8f  -->  PINA3
 // outputa   -->  PINA4
 
+//debug
+// ca        -->  PINA5
+
 // Flip boolean if a character is read. Await two rails
 // going LOW on a single bit before setting this to true again
 bool awaitingNextChar = true;
@@ -105,6 +108,9 @@ int mappedRead(String pinName) {
   }
   else if (pinName.equals("output8f")) {
      return digitalRead(A3);
+  }
+  else if (pinName.equals("ca")) {
+    return digitalRead(A5);
   }
 }
 
@@ -226,14 +232,20 @@ void loop() {
     char myChar = (char) charVal;
     Serial.print("I read the following character: ");
     Serial.println(myChar);
+    Serial.println("Setting outputa high");
 
     mappedWrite("outputa", HIGH);
     awaitingNextChar = false;
   }
   // If the output rails have reset and we are not waiting for a new character, then change the state
   // such that we are waiting for a new character once again
-  else if (!awaitingNextChar && charVal == -1) {
+  else if (!awaitingNextChar && (charVal == -1 || charVal == 255)) {
+    Serial.println("Resetting outputa");
     mappedWrite("outputa", LOW);
     awaitingNextChar = true;
+  }
+  else {
+    Serial.println("ca: " + String(mappedRead("ca")));
+    Serial.println("This is the current output: " + String(charVal));
   }
 }
