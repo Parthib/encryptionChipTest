@@ -34,8 +34,8 @@ enum state {
 
 state currentState = settingSeed;
 
-int seed = 255;
-String toEncrypt = "Hello world!";
+int seed = 0;
+String toEncrypt = "Hello world! ";
 int delayTime = 2000;
 
 void setup() {
@@ -60,7 +60,7 @@ void setup() {
   pinMode(A4, INPUT);
   pinMode(A5, OUTPUT);
 
-  Serial.begin(9600);
+ // Serial.begin(9600);
 
   // Reset everything using the global reset signal
   Serial.println("Hard resetting...");
@@ -70,12 +70,11 @@ void setup() {
 
 // Like a soft reset except also work with the board reset signal
 void hardReset() {
-  mappedWrite("boardReset", HIGH);
 
   softReset();
-
+  mappedWrite("boardReset", HIGH);
+  delay(delayTime);
   mappedWrite("boardReset", LOW);
-
   delay(delayTime);
 }
 
@@ -99,8 +98,6 @@ void softReset() {
     mappedWrite("input7f", LOW);
     mappedWrite("input8t", LOW);
     mappedWrite("input8f", LOW);
-
-    delay(delayTime);
 }
 
 // Write things to the input dual rails
@@ -243,7 +240,6 @@ Serial.println("Wrote " + String(writeVal) + " " + pinName);
 int index = 0;
 
 void loop() {
-  delay(2000);
 
   bool inputa = digitalRead(A4) == HIGH;
 

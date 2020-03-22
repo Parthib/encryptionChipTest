@@ -19,7 +19,7 @@
 // outputa   -->  PINA4
 
 //debug
-// ca        -->  PINA5
+// ca        -->  PIN0
 
 // Flip boolean if a character is read. Await two rails
 // going LOW on a single bit before setting this to true again
@@ -31,7 +31,6 @@ int delayTime = 200;
 // Set pins as input to read the output of the chip
 void setup() {
   pinMode(0, INPUT);
-  pinMode(1, INPUT);
   pinMode(2, INPUT);
   pinMode(3, INPUT);
   pinMode(4, INPUT);
@@ -110,7 +109,10 @@ int mappedRead(String pinName) {
      return digitalRead(A3);
   }
   else if (pinName.equals("ca")) {
-    return digitalRead(A5);
+    return digitalRead(0);
+  }
+  else {
+    Serial.println("Could not understand input");
   }
 }
 
@@ -223,16 +225,14 @@ void debug() {
 // Do the following forever
 void loop() {
   // Get the character if any
-
-  delay(2000);
   int charVal = getChar();
-  debug();
+//  debug();
   // If we are waiting for a character and we get something that is not -1, we print it
   if (awaitingNextChar && charVal >= 0) {
     char myChar = (char) charVal;
-    Serial.print("I read the following character: ");
-    Serial.println(myChar);
-    Serial.println("Setting outputa high");
+  //  Serial.print("I read the following character: ");
+    Serial.print(myChar);
+  //  Serial.println("Setting outputa high");
 
     mappedWrite("outputa", HIGH);
     awaitingNextChar = false;
@@ -240,12 +240,12 @@ void loop() {
   // If the output rails have reset and we are not waiting for a new character, then change the state
   // such that we are waiting for a new character once again
   else if (!awaitingNextChar && (charVal == -1 || charVal == 255)) {
-    Serial.println("Resetting outputa");
+  //  Serial.println("Resetting outputa");
     mappedWrite("outputa", LOW);
     awaitingNextChar = true;
   }
   else {
-    Serial.println("ca: " + String(mappedRead("ca")));
-    Serial.println("This is the current output: " + String(charVal));
+ //   Serial.println("ca: " + String(mappedRead("ca")));
+  //  Serial.println("This is the current output: " + String(charVal));
   }
 }
