@@ -32,10 +32,14 @@ enum state {
   awaitingInputAckLow
 };
 
+// Enable to encrypt using int array instead
+bool encryptInt = false;
 state currentState = settingSeed;
 
 int seed = 0;
 String toEncrypt = "Hello world! ";
+int toEncryptInt[] = {};
+
 int delayTime = 2000;
 
 void setup() {
@@ -173,6 +177,17 @@ void writeCharacter(char letter) {
   setInput(setVal);
 }
 
+// Like the setSeed function except we enable the cf rail and we have to cast the character
+void writeCharacter(int letter) {
+
+  // Enable cf to encrypt character
+  mappedWrite("ct", LOW);
+  mappedWrite("cf", HIGH);
+
+  // Set the input rails
+  setInput(letter);
+}
+
 // This function makes it easy to change pin assignments in the future.
 // It maps an input name to a particular pin that is outlined in the
 // beginning of this program
@@ -250,9 +265,15 @@ void loop() {
       currentState = awaitingInputAck;
     }
     else if (currentState == settingCharacter) {
-      if (index < toEncrypt.length()) {
+      if ((index < toEncrypt.length()) && !encryptInt) {
         Serial.println("Writing " + String(toEncrypt[index]));
         writeCharacter(toEncrypt[index]);
+        currentState = awaitingInputAck;
+        index += 1;
+      }
+      else if ((index < sizeof(toEncryptInt)) && encryptInt) {
+        Serial.println("Writing " + String(toEncryptInt[index]) + "(" + String((char) toEncryptInt[index]) + ")");
+        writeCharacter(toEncryptInt[index]);
         currentState = awaitingInputAck;
         index += 1;
       }

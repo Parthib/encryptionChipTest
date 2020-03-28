@@ -21,6 +21,11 @@
 //debug
 // ca        -->  PIN0
 
+// Enable to print using int array format
+bool enablePrintInt = false;
+
+bool enableDebug = false;
+
 // Flip boolean if a character is read. Await two rails
 // going LOW on a single bit before setting this to true again
 bool awaitingNextChar = true;
@@ -226,26 +231,46 @@ void debug() {
 void loop() {
   // Get the character if any
   int charVal = getChar();
-//  debug();
+  if (enableDebug) {
+    debug();
+  }
+
   // If we are waiting for a character and we get something that is not -1, we print it
   if (awaitingNextChar && charVal >= 0) {
     char myChar = (char) charVal;
-  //  Serial.print("I read the following character: ");
-    Serial.print(myChar);
-  //  Serial.println("Setting outputa high");
+
+    if (enableDebug) {
+      Serial.print("I read the following character: ");
+    }
+
+    if (!enablePrintInt) {
+      Serial.print(myChar);
+    }
+    else {
+      Serial.print(String(charVal) + ", ");
+    }
+
+    if (enableDebug) {
+      Serial.println("Setting outputa high");
+    }
 
     mappedWrite("outputa", HIGH);
     awaitingNextChar = false;
   }
+
   // If the output rails have reset and we are not waiting for a new character, then change the state
   // such that we are waiting for a new character once again
   else if (!awaitingNextChar && (charVal == -1 || charVal == 255)) {
-  //  Serial.println("Resetting outputa");
+    if (enableDebug) {
+      Serial.println("Resetting outputa");
+    }
     mappedWrite("outputa", LOW);
     awaitingNextChar = true;
   }
   else {
- //   Serial.println("ca: " + String(mappedRead("ca")));
-  //  Serial.println("This is the current output: " + String(charVal));
+    if (enableDebug) {
+      Serial.println("ca: " + String(mappedRead("ca")));
+      Serial.println("This is the current output: " + String(charVal));
+    }
   }
 }
