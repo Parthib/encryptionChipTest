@@ -1,8 +1,8 @@
 // Assume boardVdd is connected to Vdd on the Arduino
 // Assume boardGND is connected to GND on the Arduino
 // Assume boardReset is connected to A5 on the Arduino
-// cf       -->  PIN0
-// ct       -->  PIN1
+// cf       -->  PIN22
+// ct       -->  PIN23
 // input1t  -->  PIN2
 // input2t  -->  PIN3
 // input3t  -->  PIN4
@@ -32,19 +32,20 @@ enum state {
   awaitingInputAckLow
 };
 
-// Enable to encrypt using int array instead
-bool encryptInt = false;
+bool encryptFromIntArray = false;
+int toEncryptInt[] = {74, 97, 100, 125, 76, 103, 239, 110, 92, 4, 139, 170, 230, 51, 5, 3, 242, 66, 48, 215, 80, 129, 178, 229, 118, 111};
 state currentState = settingSeed;
 
-int seed = 0;
-String toEncrypt = "Hello world! ";
-int toEncryptInt[] = {};
-
+int seed = 1;
+String toEncrypt = "Hello arduino! ";
 int delayTime = 2000;
 
+int stringSize = toEncrypt.length();
+int arraySize = sizeof(toEncryptInt);
+
 void setup() {
-  pinMode(0, OUTPUT);
-  pinMode(1, OUTPUT);
+  pinMode(22, OUTPUT);
+  pinMode(23, OUTPUT);
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
@@ -64,7 +65,7 @@ void setup() {
   pinMode(A4, INPUT);
   pinMode(A5, OUTPUT);
 
- // Serial.begin(9600);
+  Serial.begin(9600);
 
   // Reset everything using the global reset signal
   Serial.println("Hard resetting...");
@@ -177,26 +178,15 @@ void writeCharacter(char letter) {
   setInput(setVal);
 }
 
-// Like the setSeed function except we enable the cf rail and we have to cast the character
-void writeCharacter(int letter) {
-
-  // Enable cf to encrypt character
-  mappedWrite("ct", LOW);
-  mappedWrite("cf", HIGH);
-
-  // Set the input rails
-  setInput(letter);
-}
-
 // This function makes it easy to change pin assignments in the future.
 // It maps an input name to a particular pin that is outlined in the
 // beginning of this program
 void mappedWrite(String pinName, int writeVal) {
   if (pinName.equals("cf")) {
-    digitalWrite(0, writeVal);
+    digitalWrite(22, writeVal);
   }
   else if (pinName.equals("ct")) {
-    digitalWrite(1, writeVal);
+    digitalWrite(23, writeVal);
   }
   else if (pinName.equals("input1t")) {
     digitalWrite(2, writeVal);
@@ -265,14 +255,13 @@ void loop() {
       currentState = awaitingInputAck;
     }
     else if (currentState == settingCharacter) {
-      if ((index < toEncrypt.length()) && !encryptInt) {
+      if (!encryptFromIntArray && index < stringSize) {
         Serial.println("Writing " + String(toEncrypt[index]));
         writeCharacter(toEncrypt[index]);
         currentState = awaitingInputAck;
         index += 1;
       }
-      else if ((index < sizeof(toEncryptInt)) && encryptInt) {
-        Serial.println("Writing " + String(toEncryptInt[index]) + "(" + String((char) toEncryptInt[index]) + ")");
+      else if (encryptFromIntArray && index < arraySize) {
         writeCharacter(toEncryptInt[index]);
         currentState = awaitingInputAck;
         index += 1;

@@ -33,6 +33,8 @@ bool awaitingNextChar = true;
 // The reader has no idea how long it takes the chip to process the raised ack rail
 int delayTime = 200;
 
+int count = 0;
+
 // Set pins as input to read the output of the chip
 void setup() {
   pinMode(0, INPUT);
